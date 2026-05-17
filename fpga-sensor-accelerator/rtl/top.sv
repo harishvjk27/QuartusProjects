@@ -4,15 +4,18 @@ module top(
 	input logic [9:0]SW,
 	
 	output logic [9:0]LEDR, //output goes to LEDS
-	output logic [6:0]HEX0 //only the first hex display
+	output logic [6:0]HEX0,  //first hex display
+	output logic [6:0]HEX1 // second hex display
 	
 	);
 
 	
 	//internal wires
-	logic signed[31:0] counter = 0;
+	logic signed [31:0]counter = 0;
 	logic valid;
-	logic signed[15:0] average_out;
+	logic signed [15:0]average_out;
+	
+	logic signed [15:0]sample_source;
 	
 	//counter logic	
 	always_ff @(posedge MAX10_CLK1_50) begin //do not need to use assign
@@ -24,6 +27,17 @@ module top(
 	
 	assign valid = 1'b1;
 	
+	always_comb begin //changing input for filter
+	
+		if(SW[1])
+			sample_source = {SW[9:6], 12'b0};
+		
+		else
+			sample_source = counter[31:16];
+	end
+	
+	
+	
 	//moving average filter
 	moving_average filter0 (
 	
@@ -31,14 +45,15 @@ module top(
 	.rst(1'b1),
 	.valid_in(valid),
 	
-	.sample_in(counter[31:16]),
+	.sample_in(sample_source),
 	
 	.average_out(average_out)
 	);
 
-	//led visuals for moving average filter
-	always_comb begin //do not need to use assign within comb
 	
+	//led visuals for moving average filter
+	
+	always_comb begin //do not need to use assign within comb
 	
 	if (SW[0])
 	
@@ -49,12 +64,23 @@ module top(
 	end
 	
 	
-	//seven segment display
-	seven_seg_decoder hex_decoder(
+	
+	
+	
+	
+	//seven segment display for hex0
+	seven_seg_decoder hex_decoder0(
 	.val(SW[3:0]),
 	.seg(HEX0)
 );
 
+	//seven seg display for hex1
+	seven_seg_decoder hex_decoder1(
+	.val(SW[7:4]),
+	.seg(HEX1)
+);
+	
+	
 
-
+	
 	endmodule
