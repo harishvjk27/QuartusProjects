@@ -17,8 +17,17 @@ module top(
 	
 	logic signed [15:0]sample_source;
 	
+	logic slow_clk = 0;
+	
+	//slow clock (updates every half second)
+	
+	clock_divider divider0 (
+	.clk(MAX10_CLK1_50),
+	.slow_clk(slow_clk)
+	);
+	
 	//counter logic	
-	always_ff @(posedge MAX10_CLK1_50) begin //do not need to use assign
+	always_ff @(posedge slow_clk) begin //do not need to use assign
 	
 	counter <= counter + 1;
 	
@@ -60,7 +69,7 @@ module top(
 		LEDR = average_out[15:6]; // filtered version of top 9 bits from counter
 	
 	else
-			LEDR = counter[29:20]; // raw from bits 20-29
+			LEDR = {2'b00, counter[7:0]}; // raw from given bits, since only 10 leds only 8 can work to display full hex
 	end
 	
 	
@@ -70,15 +79,18 @@ module top(
 	
 	//seven segment display for hex0
 	seven_seg_decoder hex_decoder0(
-	.val(SW[3:0]),
+	.val(counter[3:0]), //since we are using slow clock, these values can be more easily visible
 	.seg(HEX0)
 );
 
 	//seven seg display for hex1
 	seven_seg_decoder hex_decoder1(
-	.val(SW[7:4]),
+	.val(counter[7:4]),
 	.seg(HEX1)
 );
+	
+	
+	
 	
 	
 
