@@ -1,1 +1,1 @@
-Practice projects done with DE-10 Lite
+Practice projects for learning FPGA, ESP, and systems engineering.
