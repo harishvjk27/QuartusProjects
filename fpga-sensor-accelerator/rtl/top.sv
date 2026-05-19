@@ -3,9 +3,18 @@ module top(
 	input logic MAX10_CLK1_50,
 	input logic [9:0]SW,
 	
-	output logic [9:0]LEDR, //output goes to LEDS
-	output logic [6:0]HEX0,  //first hex display
-	output logic [6:0]HEX1 // second hex display
+	output logic [9:0]LEDR, //LEDS
+	
+	//all 6 hex displays 
+	
+	output logic [6:0]HEX0,  
+	output logic [6:0]HEX1, 
+	output logic [6:0]HEX2, 
+	output logic [6:0]HEX3, 
+	output logic [6:0]HEX4, 
+	output logic [6:0]HEX5 
+	
+	
 	
 	);
 
@@ -13,28 +22,38 @@ module top(
 	//internal wires
 	logic signed [31:0]counter = 0;
 	logic valid;
+	assign valid = 1'b1;
+	
 	logic signed [15:0]average_out;
 	
 	logic signed [15:0]sample_source;
 	
 	logic slow_clk = 0;
 	
-	//slow clock (updates every half second)
+	logic [3:0]debug;
+	
+	logic signed[31:0]counter2 = 0;
+	
+	//slow clock (updates every half second, cycle of 1 second)
 	
 	clock_divider divider0 (
 	.clk(MAX10_CLK1_50),
 	.slow_clk(slow_clk)
 	);
 	
-	//counter logic	
-	always_ff @(posedge slow_clk) begin //do not need to use assign
+	//counter logic for normal clock	
+	always_ff @(posedge MAX10_CLK1_50) begin //do not need to use assign
 	
-	counter <= counter + 1;
+	counter <= counter + 1; 
 	
 	end
 
+	always_ff @(posedge slow_clk) begin 
 	
-	assign valid = 1'b1;
+	counter2 <= counter2 + 1; //adds 1 every second! 
+	
+	end
+	
 	
 	always_comb begin //changing input for filter
 	
@@ -66,10 +85,10 @@ module top(
 	
 	if (SW[0])
 	
-		LEDR = average_out[15:6]; // filtered version of top 9 bits from counter
+			LEDR = average_out[15:6]; // filtered version of top 9 bits from counter
 	
 	else
-			LEDR = {2'b00, counter[7:0]}; // raw from given bits, since only 10 leds only 8 can work to display full hex
+			LEDR = counter[29:20]; // raw from given bits, since only 10 leds only 8 can work to display full hex
 	end
 	
 	
@@ -79,20 +98,55 @@ module top(
 	
 	//seven segment display for hex0
 	seven_seg_decoder hex_decoder0(
-	.val(counter[3:0]), //since we are using slow clock, these values can be more easily visible
+	.val(counter2[3:0]), //since we are using slow clock, these values can be more easily visible
 	.seg(HEX0)
 );
 
 	//seven seg display for hex1
 	seven_seg_decoder hex_decoder1(
-	.val(counter[7:4]),
+	.val(counter2[7:4]),
 	.seg(HEX1)
 );
 	
+	//hex2 shows first 4 bits of average
+	
+	seven_seg_decoder hex_decoder2 (
+	.val(average_out[3:0]),
+	.seg(HEX2)
+	
+	);
 	
 	
+	//hex3 shows second 4 bits of average
 	
+	seven_seg_decoder hex_decoder3 (
+	.val(average_out[7:4]),
+	.seg(HEX3)
 	
-
+	);
+	
+	//hex4 shows last 4 bits of sample source
+	
+	seven_seg_decoder hex_decoder4 (
+	.val(sample_source[15:12]),
+	.seg(HEX4)
+	
+	);
+	
+	always_comb begin
+	if (SW[0] && SW[1])	//if both switched on, debug is 1
+	 debug = 4'h1;
+	 
+	 else
+	 debug = 4'h0;
+	 
+	end
+	seven_seg_decoder hex_decoder5 ( //hex5 shows state/debug
+	
+	.val(debug),
+	.seg(HEX5)
+	
+	);
+	
 	
 	endmodule
