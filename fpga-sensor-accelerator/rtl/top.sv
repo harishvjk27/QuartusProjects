@@ -3,7 +3,11 @@ module top(
 	input logic MAX10_CLK1_50,
 	input logic [9:0]SW,
 	
+	//send switch for uart
+	input logic KEY1,
+	
 	output logic [9:0]LEDR, //LEDS
+
 	
 	//all 6 hex displays 
 	
@@ -12,8 +16,10 @@ module top(
 	output logic [6:0]HEX2, 
 	output logic [6:0]HEX3, 
 	output logic [6:0]HEX4, 
-	output logic [6:0]HEX5 
+	output logic [6:0]HEX5,
 	
+	//uart output
+	output logic ARDUINO_IO1
 	
 	
 	);
@@ -23,16 +29,25 @@ module top(
 	logic signed [31:0]counter = 0;
 	logic valid;
 	assign valid = 1'b1;
-	
+	//filter
 	logic signed [15:0]average_out;
 	
 	logic signed [15:0]sample_source;
-	
+	//clock divider
 	logic slow_clk = 0;
 	
 	logic [3:0]debug;
 	
 	logic signed[31:0]counter2 = 0;
+	//uart 
+	logic uart_out;
+	logic done;
+	logic busy;
+	logic key_prev = 1;
+	logic send_pulse;
+	
+	//uart output to arduino header on board
+	assign ARDUINO_IO1 = uart_out;
 	
 	//slow clock (updates every half second, cycle of 1 second)
 	
@@ -83,18 +98,28 @@ module top(
 	
 	always_comb begin //do not need to use assign within comb
 	
+	if(!SW[9]) begin
+	//normal dsp display
 	if (SW[0])
 	
 			LEDR = average_out[15:6]; // filtered version of top 9 bits from counter
 	
 	else
-			LEDR = counter[29:20]; // raw from given bits, since only 10 leds only 8 can work to display full hex
+			LEDR = counter[29:20]; // raw from given bits, since only 10 leds, only 8 can work to display full hex
+			
 	end
 	
 	
+	else begin //begin uart mode
 	
+	LEDR = 10'b0;
+	LEDR[0] = busy;
+	LEDR[1] = done;
+	LEDR[2] = ~uart_out;
 	
+	end
 	
+	end
 	
 	//seven segment display for hex0
 	seven_seg_decoder hex_decoder0(
@@ -148,5 +173,27 @@ module top(
 	
 	);
 	
+	// uart testing
+	uart_tx tx0 (
+	
+	.uart_in({4'b0011, SW[3:0]}),
+	.clk(MAX10_CLK1_50),
+	.send(send_pulse), //pushbuttons are active low
+	.tx(uart_out),
+	.done(done),
+	.busy(busy)
+	
+	);
+	
+	
+	//edge detection for uart, so one button press only sends one input
+	
+	always_ff @(posedge MAX10_CLK1_50) begin
+	
+	key_prev <= KEY1;
+	
+	end
+
+	assign send_pulse = key_prev && ~KEY1;
 	
 	endmodule

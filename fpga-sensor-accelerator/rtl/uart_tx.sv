@@ -1,15 +1,18 @@
 module uart_tx(
 
-input logic [7:0] hex_input,
+input logic [7:0] uart_in,
 
 input logic clk,
 
 input logic send,
 
-output logic tx, //the output is usually in the form of 
-					 // stop, 8 bits data, start from left to right
+output logic tx = 1'b1, //the output is usually in the form of 
+							   // stop, 8 bits data, start from left to right
 					 
-output logic done
+output logic done,
+
+//busy state
+output logic busy = 0
 
 );
 
@@ -17,12 +20,14 @@ logic [9:0] shift_reg = 10'b1111111111;
 logic [3:0] bit_counter = 10;
 
 // baud div is 50,000,000 / 115200 baud = ~434
+
+//localparam BAUD_DIV = 5_000_000; //debug version for fpga visualization
+
 localparam BAUD_DIV = 434; //localparam is like a static final variable in a class
-logic [9:0] baud_counter = 0;
+logic [23:0] baud_counter = 0; //wider than it needs to be due to testing
 logic baud_tick = 0;
 
-//busy state
-logic busy = 0;
+
 
 //this module sets the output to each bit of the frame, and returns it when send is not 1 until the full uart input is done
 //uart stands for universal asynchronous reciever transmitter
@@ -35,9 +40,9 @@ always_ff @(posedge clk) begin
 	
 	busy <= 1'b1; //setting busy to 1 because send is 1, so register is transmitting
 	done <= 1'b0; //not finished
-	shift_reg <= {1'b1, hex_input, 1'b0}; //filling out the full uart response
+	shift_reg <= {1'b1, uart_in, 1'b0}; //filling out the full uart response
 	bit_counter<= 0; //resetting the bit counter
-	tx <= 1'b0; //output the start bit  which is 0
+	
 
 	end
 
@@ -50,15 +55,11 @@ always_ff @(posedge clk) begin
 	bit_counter <= bit_counter + 1; //adding 1 to the bit counter
 	end
 	
-	else if(bit_counter ==10) begin //if send is not 1 and bit counter is 10 or greater (meaning we have finished going through the values)
+	else if(bit_counter >= 10 && busy) begin //if send is not 1 and bit counter is 10 or greater (meaning we have finished going through the values)
 	busy <= 1'b0; //no  longer busy, and values are finished transmitting
 	done <= 1'b1; //label to show transmitting has finished
 	tx <= 1'b1; //output is just 1 (stop bit is 1 when done)
 	
-	end
-	
-	else begin
-		done <= 1'b0;
 	end
 	
 end
