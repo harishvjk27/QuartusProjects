@@ -8,6 +8,8 @@ module top(
 	
 	output logic [9:0]LEDR, //LEDS
 
+	//uart rx input
+	input logic ARDUINO_IO0,
 	
 	//all 6 hex displays 
 	
@@ -18,13 +20,12 @@ module top(
 	output logic [6:0]HEX4, 
 	output logic [6:0]HEX5,
 	
-	//uart output
+	//uart tx output
 	output logic ARDUINO_IO1
 	
 	
 	);
 
-	
 	//internal wires
 	logic signed [31:0]counter = 0;
 	logic valid;
@@ -39,16 +40,21 @@ module top(
 	logic [3:0]debug;
 	
 	logic signed[31:0]counter2 = 0;
-	//uart 
-	logic uart_out;
-	logic done;
-	logic busy;
-	logic key_prev = 1;
-	logic send_pulse;
 	
-	//uart output to arduino header on board
-	assign ARDUINO_IO1 = uart_out;
+	// uart demo outputs
+
+	logic [9:0] uart_leds;
+
+	logic [6:0] uart_hex0;
+	logic [6:0] uart_hex1;
+
+	logic uart_tx_out;
 	
+	//assigning uart pins
+	assign ARDUINO_IO1 = uart_tx_out;
+	assign HEX0 = SW[9] ? uart_hex0 : hex0_dsp;
+	assign HEX1 = SW[9] ? uart_hex1 : hex1_dsp;
+
 	//slow clock (updates every half second, cycle of 1 second)
 	
 	clock_divider divider0 (
@@ -96,41 +102,39 @@ module top(
 	
 	//led visuals for moving average filter
 	
-	always_comb begin //do not need to use assign within comb
-	
-	if(!SW[9]) begin
-	//normal dsp display
-	if (SW[0])
-	
-			LEDR = average_out[15:6]; // filtered version of top 9 bits from counter
-	
-	else
-			LEDR = counter[29:20]; // raw from given bits, since only 10 leds, only 8 can work to display full hex
-			
+	always_comb begin
+
+	if (!SW[9]) begin
+
+		// normal dsp display
+
+		if (SW[0])
+			LEDR = average_out[15:6];
+
+		else
+			LEDR = counter[29:20];
+
 	end
-	
-	
-	else begin //begin uart mode
-	
-	LEDR = 10'b0;
-	LEDR[0] = busy;
-	LEDR[1] = done;
-	LEDR[2] = ~uart_out;
-	
+
+	else begin
+
+		LEDR = uart_leds;
+
 	end
+
+end
 	
-	end
 	
 	//seven segment display for hex0
 	seven_seg_decoder hex_decoder0(
 	.val(counter2[3:0]), //since we are using slow clock, these values can be more easily visible
-	.seg(HEX0)
+	.seg(hex0_dsp)
 );
 
 	//seven seg display for hex1
 	seven_seg_decoder hex_decoder1(
 	.val(counter2[7:4]),
-	.seg(HEX1)
+	.seg(hex1_dsp)
 );
 	
 	//hex2 shows first 4 bits of average
@@ -173,27 +177,26 @@ module top(
 	
 	);
 	
-	// uart testing
-	uart_tx tx0 (
-	
-	.uart_in({4'b0011, SW[3:0]}),
-	.clk(MAX10_CLK1_50),
-	.send(send_pulse), //pushbuttons are active low
-	.tx(uart_out),
-	.done(done),
-	.busy(busy)
-	
-	);
-	
-	
-	//edge detection for uart, so one button press only sends one input
-	
-	always_ff @(posedge MAX10_CLK1_50) begin
-	
-	key_prev <= KEY1;
-	
-	end
 
-	assign send_pulse = key_prev && ~KEY1;
+	//UART Demo when switch[9] is pressed
+	
+	uart_demo uart0(
+
+	.clk(MAX10_CLK1_50),
+
+	.switches(SW[3:0]),
+
+	.send_button(KEY1),
+
+	.uart_rx_pin(ARDUINO_IO0),
+
+	.uart_tx_pin(uart_tx_out),
+
+	.leds(uart_leds),
+
+	.hex0(uart_hex0),
+	.hex1(uart_hex1)
+
+);
 	
 	endmodule

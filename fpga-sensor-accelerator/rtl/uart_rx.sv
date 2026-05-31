@@ -30,8 +30,7 @@ always_ff @(posedge clk) begin
 
 		busy <= 1; //we have recieved the first bit
 		bit_counter <= 0; //set to 0 because this is new uart transmission
-		
-		baud_counter <= BAUD_DIV/2;
+
 
 	end
 	
@@ -71,9 +70,9 @@ always_ff @(posedge clk) begin
 	
 	always_ff @(posedge clk) begin 
 
-if (baud_counter == BAUD_DIV-1) begin //if baud_counter is going to hit the BAUD_DIV-1 because the counter starts at 0, so 434 ticks is 0-433.
+	if (baud_counter == BAUD_DIV-1) begin //if baud_counter is going to hit the BAUD_DIV-1 because the counter starts at 0, so 434 ticks is 0-433.
 
-	baud_counter<= 0; //reset counter
+	baud_counter <= 0; //reset counter
 	baud_tick <= 1; //set baud_tick to 1
 	
 end
