@@ -48,7 +48,7 @@ output logic [6:0] hex1
 	// uart tx testing
 	uart_tx tx0 (
 
-		.uart_in({4'b0011, switches}),
+		.uart_in(rx_data), //made rx_data as the input for keyboard -> FPGA -> PC operation
 		.clk(clk),
 		.send(send_pulse),
 		.tx(uart_out),
@@ -88,9 +88,10 @@ output logic [6:0] hex1
 	always_ff @(posedge clk) begin
 
 		key_prev <= send_button;
-
+		
 	end
 
 	assign send_pulse = key_prev && ~send_button;
+	
 
 endmodule
