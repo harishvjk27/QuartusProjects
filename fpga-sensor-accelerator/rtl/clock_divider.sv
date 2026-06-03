@@ -9,7 +9,7 @@ output logic slow_clk
 
 logic [24:0]counter = 0; //since counter goes to up 25million, we need 25 bits for 25 positions, a 25 bit # can store up to 33,554,431
 
-always_ff @(posedge clk) begin
+always_ff @(posedge clk) begin //this is like a while loop
 
 counter <= counter + 1;
 

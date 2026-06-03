@@ -26,6 +26,8 @@ logic baud_tick = 0;
 
 always_ff @(posedge clk) begin
 
+	done <= 0; //resets every clock
+	
 	if (rx == 0 && !busy) begin //checking the start bit, if we are not busy and the rx is 0, then this is the start bit
 
 		busy <= 1; //we have recieved the first bit
@@ -60,12 +62,16 @@ always_ff @(posedge clk) begin
 		busy <= 0;
 		done <= 1;
 		
+		bit_counter <= 11; //moving it to 11
+		
 		data_out <= shift_reg[8:1];
 		end
-
-		end
-	
-	
+		
+		
+		
+end		
+		
+		
 	//baud counter logic
 	
 	always_ff @(posedge clk) begin 

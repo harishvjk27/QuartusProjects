@@ -31,7 +31,7 @@ output logic [6:0] hex1
 	logic rx_done;
 
 	//uart tx output
-	assign uart_tx_pin = uart_out;
+	assign uart_tx_pin = uart_out;	
 
 	//begin uart mode and assign values to onboard LEDS
 	always_comb begin
@@ -50,7 +50,7 @@ output logic [6:0] hex1
 
 		.uart_in(rx_data), //made rx_data as the input for keyboard -> FPGA -> PC operation
 		.clk(clk),
-		.send(send_pulse),
+		.send(rx_done),
 		.tx(uart_out),
 		.done(done),
 		.busy(busy)
@@ -83,15 +83,16 @@ output logic [6:0] hex1
 
 	);
 
-	// edge detection for uart, so one button press only sends one input
+	// edge detection for uart tx, so one button press only sends one input
 
 	always_ff @(posedge clk) begin
 
 		key_prev <= send_button;
 		
+		
 	end
 
 	assign send_pulse = key_prev && ~send_button;
-	
-
+		
+		
 endmodule
