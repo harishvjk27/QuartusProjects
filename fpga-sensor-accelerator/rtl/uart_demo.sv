@@ -32,6 +32,9 @@ output logic [6:0] hex1
 
 	//uart tx output
 	assign uart_tx_pin = uart_out;	
+	
+	// uart tx processed value
+	logic [7:0]tx_data;
 
 	//begin uart mode and assign values to onboard LEDS
 	always_comb begin
@@ -48,7 +51,8 @@ output logic [6:0] hex1
 	// uart tx testing
 	uart_tx tx0 (
 
-		.uart_in(rx_data), //made rx_data as the input for keyboard -> FPGA -> PC operation
+		//.uart_in(rx_data), //made rx_data as the input for keyboard -> FPGA -> PC operation, it is currently processed by the uart_processor
+		.uart_in(tx_data), //the processed rx_data, which becomes tx_data from the uart_processor is set as the input. 
 		.clk(clk),
 		.send(rx_done),
 		.tx(uart_out),
@@ -93,6 +97,12 @@ output logic [6:0] hex1
 	end
 
 	assign send_pulse = key_prev && ~send_button;
-		
+	
+	//uart processor to convert lowercase letters to uppercase
+	uart_processor uart_p1 (
+	.rx_data(rx_data),
+	.tx_data(tx_data)
+	
+		);
 		
 endmodule
