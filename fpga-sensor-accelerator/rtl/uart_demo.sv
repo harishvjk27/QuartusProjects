@@ -33,8 +33,15 @@ output logic [6:0] hex1
 	//uart tx output
 	assign uart_tx_pin = uart_out;	
 	
-	// uart tx processed value
+	// uart tx processer values
 	logic [7:0]tx_data;
+	logic help_cmd;
+
+	logic debug_cmd;
+
+	logic filter_cmd;
+
+	logic led_cmd;
 
 	//begin uart mode and assign values to onboard LEDS
 	always_comb begin
@@ -45,6 +52,13 @@ output logic [6:0] hex1
 		leds[1] = done;
 		leds[2] = ~uart_out;
 		leds[3] = rx_done;
+		
+		//processor led values
+		
+		leds[4] = help_cmd;
+		leds[5] = debug_cmd;
+		leds[6] = filter_cmd;
+		leds[7] = led_cmd;
 
 	end
 
@@ -101,7 +115,11 @@ output logic [6:0] hex1
 	//uart processor to convert lowercase letters to uppercase
 	uart_processor uart_p1 (
 	.rx_data(rx_data),
-	.tx_data(tx_data)
+	.tx_data(tx_data),
+	.help_cmd(help_cmd),
+	.debug_cmd(debug_cmd),
+	.filter_cmd(filter_cmd),
+	.led_cmd(led_cmd)
 	
 		);
 		
