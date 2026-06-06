@@ -2,6 +2,8 @@ module uart_processor (
 
 input logic[7:0] rx_data,
 
+input logic rx_done,
+
 output logic [7:0] tx_data,
 
 output logic help_cmd,
@@ -24,7 +26,7 @@ tx_data = rx_data;
 		end
 		
 	help_cmd = 1'b0;
-	if (rx_data == "H" || rx_data == "h") begin
+	if (rx_done && (rx_data == "H" || rx_data == "h")) begin
 		help_cmd = 1'b1;
 		
 	end
