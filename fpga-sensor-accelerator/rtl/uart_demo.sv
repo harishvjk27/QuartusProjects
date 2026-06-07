@@ -132,10 +132,12 @@ output logic [6:0] hex1
 		
 	//uart response sender, to start the fsm states
 	uart_response_sender uart_rs1 (
+		.clk(clk),
 		.help_cmd(help_cmd),
 		.debug_cmd(debug_cmd),
 		.filter_cmd(filter_cmd),
 		.led_cmd(led_cmd),
+		.tx_done(done),
 		.response_tx_start(response_tx_start),
 		.response_tx_data(response_tx_data)
 		);
