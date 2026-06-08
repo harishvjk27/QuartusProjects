@@ -32,19 +32,19 @@ tx_data = rx_data;
 	end
 	
 	debug_cmd = 1'b0;
-	if (rx_data == "D" || rx_data == "d") begin
+	if (rx_done && (rx_data == "D" || rx_data == "d")) begin
 		debug_cmd = 1'b1;
 		
 	end
 	
 	filter_cmd = 1'b0;
-	if (rx_data == "F" || rx_data == "f") begin
+	if (rx_done && (rx_data == "F" || rx_data == "f")) begin
 		filter_cmd = 1'b1;
 		
 	end
 	
 	led_cmd = 1'b0;
-	if (rx_data == "L" || rx_data == "l") begin
+	if (rx_done && (rx_data == "L" || rx_data == "l")) begin
 		led_cmd = 1'b1;
 		
 	end

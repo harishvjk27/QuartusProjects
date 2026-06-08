@@ -19,7 +19,7 @@ output logic [6:0] hex1
 
 	//internal wires
 
-	//uart tx inputs
+	//uart tx inputs 
 	logic uart_out;
 	logic done;
 	logic busy;
