@@ -41,6 +41,9 @@ module top(
 	
 	logic signed[31:0]counter2 = 0;
 	
+	logic [6:0] hex0_dsp;
+	logic [6:0] hex1_dsp;
+	
 	// uart demo outputs
 
 	logic [9:0] uart_leds;

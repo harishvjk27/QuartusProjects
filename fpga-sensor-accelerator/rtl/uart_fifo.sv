@@ -37,8 +37,9 @@ end
 
 always_ff @(posedge clk) begin
 
+	
 
-	if (write_en && !full) begin //when write is enabled and full is not true, then write the data from current write_ptr to the memory
+	if ((write_en && !full) && !(read_en && !empty)) begin //when write is enabled and full is not true, then write the data from current write_ptr to the memory
 
 		mem[write_ptr] <= data_in;
 	
@@ -48,13 +49,27 @@ always_ff @(posedge clk) begin
 
 	end
 	
-	if (read_en && !empty) begin//when read is enabled and empty is not true, read the data from current read_ptr memory and store it into data_out
+	else if ((read_en && !empty) && !(write_en && !full)) begin//when read is enabled and empty is not true, read the data from current read_ptr memory and store it into data_out
 
 		data_out <= mem[read_ptr];
 		read_ptr <= read_ptr + 1;
 		count <= count - 1;
 		
+		end
+		
+	else if((write_en && !full) && (read_en && !empty)) begin //when both cases are true
+	
+		mem[write_ptr] <= data_in;
+      write_ptr <= write_ptr + 1;
+
+      data_out <= mem[read_ptr];
+      read_ptr <= read_ptr + 1;
+	
+	
+	count <= count; //doesnt change
+	
+	end
+		
 	end
 
-end
 endmodule
