@@ -19,6 +19,8 @@ logic [2:0] write_ptr = 0;
 logic [2:0] read_ptr = 0;
 logic [3:0] count = 0; //is 4 bits because it needs to go from 0 to 8, not 0 to 7. The FIFO depth is 8.
 
+assign data_out = mem[read_ptr];
+
 always_comb begin
 
 full = 1'b0;
@@ -51,7 +53,6 @@ always_ff @(posedge clk) begin
 	
 	else if ((read_en && !empty) && !(write_en && !full)) begin//when read is enabled and empty is not true, read the data from current read_ptr memory and store it into data_out
 
-		data_out <= mem[read_ptr];
 		read_ptr <= read_ptr + 1;
 		count <= count - 1;
 		
@@ -62,7 +63,6 @@ always_ff @(posedge clk) begin
 		mem[write_ptr] <= data_in;
       write_ptr <= write_ptr + 1;
 
-      data_out <= mem[read_ptr];
       read_ptr <= read_ptr + 1;
 	
 	
@@ -72,4 +72,5 @@ always_ff @(posedge clk) begin
 		
 	end
 
-endmodule
+
+	endmodule

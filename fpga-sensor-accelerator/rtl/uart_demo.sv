@@ -46,6 +46,15 @@ output logic [6:0] hex1
 	//uart response values
 	logic response_tx_start;
 	logic [7:0] response_tx_data;
+	
+	//uart fifo values
+	logic [7:0] fifo_data_out;
+	
+	logic fifo_empty;
+	logic fifo_full;
+	
+	logic fifo_write_en;
+	logic fifo_read_en;
 
 	//begin uart mode and assign values to onboard LEDS
 	always_comb begin
@@ -120,8 +129,8 @@ output logic [6:0] hex1
 	
 	//uart processor to convert lowercase letters to uppercase
 	uart_processor uart_p1 (
-	.rx_data(rx_data),
-	.rx_done(rx_done),
+	.rx_data(fifo_data_out), //is now the fifo output
+	.rx_done(fifo_read_en), //when the data is being read in the fifo
 	.tx_data(tx_data),
 	.help_cmd(help_cmd),
 	.debug_cmd(debug_cmd),
@@ -141,5 +150,23 @@ output logic [6:0] hex1
 		.response_tx_start(response_tx_start),
 		.response_tx_data(response_tx_data)
 		);
+		
+	//fifo module to quickly process bytes and output them, good for a "queue" of incoming data 
+	
+	assign fifo_write_en = rx_done;
+	assign fifo_read_en = !fifo_empty;
+	
+	uart_fifo uartu_fifo1 (
+	
+	.clk(clk),
+	.write_en(fifo_write_en),
+	.read_en(fifo_read_en),
+	.data_in(rx_data),
+	.data_out(fifo_data_out),
+	.full(fifo_full),
+	.empty(fifo_empty)
+	
+	);
+		
 		
 endmodule
