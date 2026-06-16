@@ -154,7 +154,16 @@ output logic [6:0] hex1
 	//fifo module to quickly process bytes and output them, good for a "queue" of incoming data 
 	
 	assign fifo_write_en = rx_done;
-	assign fifo_read_en = !fifo_empty;
+	
+	
+	always_ff @(posedge clk) begin //a simple fifo read controller
+	
+	fifo_read_en <= 0;
+	
+	if (!fifo_empty)
+		fifo_read_en <= 1;
+		
+		end
 	
 	uart_fifo uartu_fifo1 (
 	
