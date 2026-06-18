@@ -84,8 +84,11 @@ top.sv
 &emsp; &nbsp; &nbsp;    ├── uart_fifo.sv  
 &emsp; &nbsp; &nbsp;    └── seven_seg_decoder.sv  
 
+<img width="1862" height="412" alt="image" src="https://github.com/user-attachments/assets/8a58f566-e068-49d5-bbe1-ba0834262903" />
+
+
     
-# Hardware Setup
+# Component Setup
 ## Hardware
 - Altera DE10-Lite FPGA Board
 - Intel MAX10 FPGA
@@ -97,7 +100,25 @@ top.sv
 - Arduino Serial Monitor
 - Visual Studio Code
 
-# Command Examples
+# Verification
+
+The following modules were verified through simulation and hardware testing:
+
+| Module                | Simulation | Hardware |
+| --------------------- | :--------: | :------: |
+| UART TX               |      ✓     |     ✓    |
+| UART RX               |      ✓     |     ✓    |
+| UART Processor        |      ✓     |     ✓    |
+| UART Response FSM     |      ✓     |     ✓    |
+| UART FIFO             |      ✓     |     ✓    |
+| Moving Average Filter |      ✓     |     ✓    |
+| Seven Segment Decoder |      ✓     |     ✓    |
+
+Hardware testing was performed using an Intel DE10-Lite FPGA board and a CP2102 USB-to-UART converter. UART communication was validated using the Arduino Serial Monitor at 115200 baud.
+
+Here is an example of the FIFO testbench running in ModelSim:
+<img width="1918" height="1005" alt="image" src="https://github.com/user-attachments/assets/961dc60d-51bf-4847-8255-01ed5c6ff1e4" />
+
 # Lessons Learned
 
 - UART frame construction and LSB-first transmission
@@ -112,3 +133,15 @@ top.sv
 - Testbench development and verification
 
 # Future Improvements
+
+* Add additional UART commands and responses.
+* Implement a command menu and help system.
+* Expand the FIFO to support larger buffer depths.
+* Add CRC or parity checking for error detection.
+* Create a VGA or LCD visualization interface.
+* Support configurable baud rates.
+* Improve FIFO read control with a dedicated consumer FSM.
+* Add waveform screenshots and block diagrams to the documentation.
+* Create additional testbenches with self-checking assertions.
+* Extend the DSP subsystem with additional digital filters.
+
