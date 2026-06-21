@@ -72,6 +72,7 @@ Arduino IDE was used to test UART inputs and outputs.
 
 # Module Hierarchy
 
+rtl/  
 top.sv   
 ├── clock_divider.sv  
 ├── moving_average.sv  
@@ -82,7 +83,14 @@ top.sv
 &emsp; &nbsp; &nbsp;    ├── uart_processor.sv  
 &emsp; &nbsp; &nbsp;    ├── uart_response_sender.sv  
 &emsp; &nbsp; &nbsp;    ├── uart_fifo.sv  
-&emsp; &nbsp; &nbsp;    └── seven_seg_decoder.sv  
+&emsp; &nbsp; &nbsp;    └── seven_seg_decoder.sv 
+
+sim/   
+├── tb_seven_seg_decoder.sv   
+├── tb_moving_average.sv   
+├── tb_uart_tx.sv   
+├── tb_uart_rx.sv   
+└── tb_uart_fifo.sv  
 
 <img width="1862" height="412" alt="image" src="https://github.com/user-attachments/assets/8a58f566-e068-49d5-bbe1-ba0834262903" />
 
@@ -118,6 +126,21 @@ Hardware testing was performed using an Intel DE10-Lite FPGA board and a CP2102 
 
 Here is an example of the FIFO testbench running in ModelSim:
 <img width="1918" height="1005" alt="image" src="https://github.com/user-attachments/assets/961dc60d-51bf-4847-8255-01ed5c6ff1e4" />
+
+# Hardware Demonstrations (click image to open video)
+
+### Counter and Clock Divider Demo
+Demonstrates binary counting and clock division using the DE10-Lite LEDs and HEX displays.
+[![Counter Demo](https://img.youtube.com/vi/NAK6CtVayck/0.jpg)](https://www.youtube.com/watch?v=NAK6CtVayck)
+
+### DSP Visualization Demo
+Demonstrates switch-controlled inputs and moving average filter visualization on LEDs and seven-segment displays.
+[![DSP Demo](https://img.youtube.com/vi/d_OaONLjnS4/0.jpg)](https://www.youtube.com/watch?v=d_OaONLjnS4)
+
+### UART Communication Demo
+Demonstrates UART transmission and reception between the DE10-Lite FPGA and a PC through a CP2102 USB-to-UART converter. Inputs are selected using board switches and transmitted using a pushbutton.
+
+[![UART Demo](https://img.youtube.com/vi/9YgWn7VIyAc/0.jpg)](https://www.youtube.com/watch?v=9YgWn7VIyAc)
 
 # Lessons Learned
 
