@@ -17,6 +17,15 @@ logic [2:0] opcode;
 logic [1:0] rd;
 logic [1:0] rs;
 
+logic [7:0] reg_write_data;
+logic reg_write_en;
+logic [7:0] reg_data1;
+logic [7:0] reg_data2;
+
+logic [7:0]alu_result;
+logic zero_flag;
+
+
 
 //small divider for slower clock, it sets slow enable to true only when slow_count is 0, and since slow_count increases on each clock cycle, its goes 50million times per second (50Mhz)
 //, but since slow_count is 25 bits, it resets to 0 every time it hits 2^25(3355432), so slow_enable is only 0 every 50million/3355432 seconds, which is about 1.5seconds. 
@@ -32,6 +41,7 @@ end
 
 assign slow_enable = (slow_count == 0);
 
+assign reg_write_en = 1'b0; 
 
 program_counter pc1 (
 
@@ -59,6 +69,31 @@ instruction_decoder id1 (
 .opcode(opcode),
 .rd(rd),
 .rs(rs)
+
+);
+
+register_file rf1 (
+
+.clk(MAX10_CLK1_50),
+.write_en(reg_write_en),
+.write_data(reg_write_data),
+
+.read_addr1(rd),
+.read_addr2(rs),
+
+.read_data1(reg_data1),
+.read_data2(reg_data2)
+
+);
+
+alu a1 ( 
+
+.a(reg_data1),
+.b(reg_data2),
+.opcode(opcode),
+.result(alu_result),
+.zero_flag(zero_flag)
+
 
 );
 
