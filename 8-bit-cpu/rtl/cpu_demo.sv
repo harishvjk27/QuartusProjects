@@ -36,12 +36,16 @@ logic slow_enable;
 
 always_ff @(posedge MAX10_CLK1_50) begin
 
-slow_count = slow_count + 1;
+slow_count <= slow_count + 1;
 end
 
 assign slow_enable = (slow_count == 0);
 
-assign reg_write_en = 1'b0; 
+assign reg_write_data = alu_result;
+assign reg_write_en = SW[2]; 
+
+
+
 
 program_counter pc1 (
 
@@ -56,7 +60,7 @@ program_counter pc1 (
 
 instruction_memory im1 (
 
-.address(pc),
+.address(pc[3:0]),
 .instruction(instruction)
 
 );
@@ -77,6 +81,7 @@ register_file rf1 (
 .clk(MAX10_CLK1_50),
 .write_en(reg_write_en),
 .write_data(reg_write_data),
+.write_addr(rd),
 
 .read_addr1(rd),
 .read_addr2(rs),
@@ -96,6 +101,13 @@ alu a1 (
 
 
 );
+
+assign LEDR[2:0] = opcode;
+assign LEDR[4:3] = rd;
+assign LEDR[6:5] = rs;
+assign LEDR[7]   = zero_flag;
+assign LEDR[8]   = reg_write_en;
+
 
 seven_seg_decoder ssd0 (
 
