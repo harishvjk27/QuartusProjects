@@ -17,6 +17,16 @@ output logic [7:0] read_data2
 
 logic [7:0] regs[0:3]; //internal 4 registers each with 8 bit widths.
 
+initial begin 
+
+	regs[0] = 8'd5;
+	regs[1] = 8'd3;
+	regs[2] = 8'd10;
+	regs[3] = 8'd1;
+
+end
+
+
 always_ff @(posedge clk) begin
 
 	if (write_en) begin
@@ -31,7 +41,6 @@ end
  
  assign read_data1 = regs[read_addr1];
  assign read_data2 = regs[read_addr2];
- 
  
  endmodule
  
