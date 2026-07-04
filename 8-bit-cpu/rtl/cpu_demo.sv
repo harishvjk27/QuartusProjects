@@ -27,6 +27,7 @@ logic zero_flag;
 
 logic pc_enable;
 
+
 //small divider for slower clock, it sets slow enable to true only when slow_count is 0, and since slow_count increases on each clock cycle, its goes 50million times per second (50Mhz)
 //, but since slow_count is 25 bits, it resets to 0 every time it hits 2^25(3355432), so slow_enable is only 0 every 50million/3355432 seconds, which is about 1.5seconds. 
 //Making a mini 1.5 second clock.
@@ -51,7 +52,7 @@ program_counter pc1 (
 
 .clk(MAX10_CLK1_50),
 .reset(SW[0]),
-.enable(SW[1] && slow_enable),
+.enable(pc_enable && slow_enable),
 
 .pc(pc)
 
@@ -101,17 +102,16 @@ alu a1 (
 
 
 );
-
-assign LEDR[2:0] = opcode;
-assign LEDR[4:3] = rd;
-assign LEDR[6:5] = rs;
-assign LEDR[7]   = zero_flag;
+assign LEDR[1:0] = rd;
+assign LEDR[3:2] = rs;
 assign LEDR[8]   = reg_write_en;
+assign LEDR[9]   = zero_flag;
 
 control_fsm fsm1 (
 
 .clk(MAX10_CLK1_50),
 .reset(SW[0]),
+.enable(slow_enable),
 
 .pc_enable(pc_enable),
 .reg_write_en(reg_write_en)

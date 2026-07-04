@@ -2,9 +2,11 @@ module control_fsm (
 
 input logic clk,
 input logic reset,
+input logic enable,
 
 output logic pc_enable,
 output logic reg_write_en
+
 
 
 );
@@ -30,7 +32,7 @@ if (reset)
 
 	current_state <= RESET;
 	
-else
+else if(enable)
 	current_state <= next_state;
 end
 

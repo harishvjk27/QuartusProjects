@@ -10,7 +10,7 @@ output logic [1:0] rs
 );
 
 assign opcode = instruction[7:5];
-assign rd = instruction[4:0];
+assign rd = instruction[4:3];
 assign rs = instruction[2:1];
 
 endmodule
