@@ -23,7 +23,7 @@ This CPU receives the instructions from the ROM and decodes them into signals. O
                       v        v
                   +---------------+
                   | Register File |
-                  +-------+-------+
+                  +------+--------+
                          |
                          v
                     +----------+
