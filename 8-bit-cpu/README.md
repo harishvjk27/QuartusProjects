@@ -98,6 +98,8 @@ The following modules were verified through simulation and hardware testing:
 
 
 # Hardware Demonstration
+[![CPU Demo](https://img.youtube.com/vi/Qf0wSjcDBiQ/0.jpg)](https://www.youtube.com/watch?v=Qf0wSjcDBiQ)
+
 
 # Lessons Learned
 - CPU datapath design
